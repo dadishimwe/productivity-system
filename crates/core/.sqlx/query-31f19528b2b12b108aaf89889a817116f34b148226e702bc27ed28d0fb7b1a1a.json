@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE tasks\n        SET column_id = ?1, position = ?2, updated_at = ?3\n        WHERE id = ?4 AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "31f19528b2b12b108aaf89889a817116f34b148226e702bc27ed28d0fb7b1a1a"
+}

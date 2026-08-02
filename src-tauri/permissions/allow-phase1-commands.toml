@@ -1,0 +1,25 @@
+[[permission]]
+identifier = "allow-phase1-commands"
+description = "Phase 1 IPC commands"
+commands.allow = [
+  "create_board_cmd",
+  "list_boards_cmd",
+  "rename_board_cmd",
+  "reorder_board_cmd",
+  "delete_board_cmd",
+  "create_column_cmd",
+  "list_columns_cmd",
+  "rename_column_cmd",
+  "reorder_column_cmd",
+  "delete_column_cmd",
+  "create_task_cmd",
+  "list_tasks_cmd",
+  "move_task_cmd",
+  "create_habit_cmd",
+  "list_habits_cmd",
+  "update_habit_cmd",
+  "delete_habit_cmd",
+  "log_habit_cmd",
+  "unlog_habit_cmd",
+  "list_habit_logs_cmd",
+]

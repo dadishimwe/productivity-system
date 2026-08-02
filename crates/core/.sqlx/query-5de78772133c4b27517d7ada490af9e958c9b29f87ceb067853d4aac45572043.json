@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO habit_logs (id, habit_id, date, value, created_at, updated_at, deleted_at)\n        VALUES (?1, ?2, ?3, ?4, ?5, ?6, NULL)\n        ON CONFLICT(habit_id, date) DO UPDATE SET\n            value = excluded.value,\n            updated_at = excluded.updated_at,\n            deleted_at = NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "5de78772133c4b27517d7ada490af9e958c9b29f87ceb067853d4aac45572043"
+}

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT position as \"position!: f64\"\n        FROM tasks\n        WHERE column_id = ?1 AND deleted_at IS NULL\n        ORDER BY position ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "position!: f64",
+        "ordinal": 0,
+        "type_info": "Float"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "090d6de644700eda9c9e5d88dce562613ed4460050177fc14202f6717f501353"
+}

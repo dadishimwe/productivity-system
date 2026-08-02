@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE columns SET name = ?1, updated_at = ?2 WHERE id = ?3 AND deleted_at IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "53850e9fbedd70f0c282554522c99dbb7c702557e4451b0341976cee186c0fc9"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE habit_logs SET deleted_at = ?1, updated_at = ?1\n        WHERE habit_id = ?2 AND date = ?3 AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "ed034db492ec7f3dae90265b25cfe0b7a0cfe2358203f40a350ef16f63b71c2b"
+}

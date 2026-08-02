@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  DATABASE_URL: sqlite://productivity.db
+  SQLX_OFFLINE: true
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: crates/core
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            crates/core
+            src-tauri
+
+      - name: Create database and run migrations
+        run: |
+          cargo install sqlx-cli --no-default-features --features sqlite --locked
+          sqlx database create
+          sqlx migrate run --source src/migrations
+
+      - name: sqlx prepare check
+        run: cargo sqlx prepare --check
+
+      - name: cargo test
+        working-directory: .
+        run: cargo test --workspace
+
+      - name: cargo clippy
+        working-directory: .
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm test

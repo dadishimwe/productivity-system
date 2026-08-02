@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE boards SET name = ?1, updated_at = ?2 WHERE id = ?3 AND deleted_at IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "8f0c035f7f196353285e39cfb95811bc85be59cdb5e029abdea31e8e0d410ef8"
+}

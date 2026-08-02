@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id as \"id!\",\n            habit_id as \"habit_id!\",\n            date as \"date!\",\n            value as \"value!\",\n            created_at as \"created_at!\",\n            updated_at as \"updated_at!\",\n            deleted_at\n        FROM habit_logs\n        WHERE habit_id = ?1 AND date = ?2 AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "habit_id!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "date!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "value!",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_at!",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at!",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "deleted_at",
+        "ordinal": 6,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "8a2f521b088558ea539d6c672d75b8477a378038118eb31120b1bad85b09d922"
+}

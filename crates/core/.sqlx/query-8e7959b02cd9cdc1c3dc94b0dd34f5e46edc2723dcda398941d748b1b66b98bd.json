@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO habits (id, name, color, target_frequency, created_at, updated_at, deleted_at)\n        VALUES (?1, ?2, ?3, ?4, ?5, ?6, NULL)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "8e7959b02cd9cdc1c3dc94b0dd34f5e46edc2723dcda398941d748b1b66b98bd"
+}

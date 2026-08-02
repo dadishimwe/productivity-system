@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT id as \"id!\" FROM columns\n        WHERE deleted_at IS NULL\n        ORDER BY position ASC\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "86cf84f093591bcfd4f2c0e29d164434c0e18873445c0528c1516509bb2cd8c4"
+}
