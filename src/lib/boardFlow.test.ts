@@ -24,7 +24,10 @@ describe("board workflow", () => {
       if (cmd === "list_boards_cmd") return [board];
       if (cmd === "list_columns_cmd") return [column];
       if (cmd === "list_tasks_cmd") return tasks;
-      if (cmd === "move_task_cmd") return { ...tasks[1], position: args?.newPosition };
+      if (cmd === "move_task_cmd") {
+        const a = args as { newPosition?: number };
+        return { ...tasks[1], position: a?.newPosition };
+      }
       return null;
     });
 

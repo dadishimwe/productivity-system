@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { BoardView } from "./components/BoardView";
+import { CalendarView } from "./components/CalendarView";
+import { DialogHost } from "./components/DialogHost";
 import { HabitsView } from "./components/HabitsView";
 import { ShoppingView } from "./components/ShoppingView";
 
-type Tab = "board" | "habits" | "shopping";
+type Tab = "board" | "habits" | "shopping" | "calendar";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("board");
@@ -30,8 +32,17 @@ export default function App() {
           >
             Shopping
           </button>
+          <button
+            type="button"
+            className={tabClass("calendar")}
+            onClick={() => setTab("calendar")}
+          >
+            Calendar
+          </button>
         </nav>
       </header>
+
+      <DialogHost />
 
       {error && (
         <p className="mb-4 rounded border border-red-900/50 bg-red-950/40 px-3 py-2 text-sm text-red-200">
@@ -42,6 +53,7 @@ export default function App() {
       {tab === "board" && <BoardView onError={setError} />}
       {tab === "habits" && <HabitsView onError={setError} />}
       {tab === "shopping" && <ShoppingView onError={setError} />}
+      {tab === "calendar" && <CalendarView onError={setError} />}
     </main>
   );
 }

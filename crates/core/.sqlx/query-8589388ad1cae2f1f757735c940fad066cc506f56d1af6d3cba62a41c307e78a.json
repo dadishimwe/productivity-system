@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE calendars SET deleted_at = ?1, updated_at = ?2\n        WHERE id = ?3 AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "8589388ad1cae2f1f757735c940fad066cc506f56d1af6d3cba62a41c307e78a"
+}

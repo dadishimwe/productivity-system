@@ -1,8 +1,10 @@
 pub mod boards;
+pub mod calendars;
 pub mod columns;
 pub mod db;
 pub mod envelope;
 pub mod error;
+pub mod events;
 pub mod habit_logs;
 pub mod habits;
 pub mod outbox;

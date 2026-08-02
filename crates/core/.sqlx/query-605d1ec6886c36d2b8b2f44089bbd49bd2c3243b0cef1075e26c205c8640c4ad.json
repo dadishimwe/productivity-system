@@ -1,0 +1,104 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id as \"id!\",\n            calendar_id as \"calendar_id!\",\n            title as \"title!\",\n            description,\n            start_ms as \"start_ms!\",\n            end_ms as \"end_ms!\",\n            all_day as \"all_day!\",\n            rrule,\n            source as \"source!\",\n            external_event_id,\n            external_calendar_id,\n            last_synced_at,\n            created_at as \"created_at!\",\n            updated_at as \"updated_at!\",\n            deleted_at\n        FROM events\n        WHERE id = ?1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "calendar_id!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "title!",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "description",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "start_ms!",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "end_ms!",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "all_day!",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "rrule",
+        "ordinal": 7,
+        "type_info": "Text"
+      },
+      {
+        "name": "source!",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "external_event_id",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "external_calendar_id",
+        "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "last_synced_at",
+        "ordinal": 11,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_at!",
+        "ordinal": 12,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at!",
+        "ordinal": 13,
+        "type_info": "Integer"
+      },
+      {
+        "name": "deleted_at",
+        "ordinal": 14,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "605d1ec6886c36d2b8b2f44089bbd49bd2c3243b0cef1075e26c205c8640c4ad"
+}

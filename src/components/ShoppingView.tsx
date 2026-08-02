@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { confirmDelete, promptRename } from "../lib/dialogs";
+import { confirmDelete, promptRename, promptText } from "../lib/dialogs";
 import { formatMoney, parseMoneyToCents } from "../lib/money";
 import { IconButton } from "./IconButton";
 
@@ -93,7 +93,7 @@ export function ShoppingView({ onError }: { onError: (msg: string) => void }) {
 
   async function renameList() {
     if (!listId || !currentList) return;
-    const name = promptRename(currentList.name, "list");
+    const name = await promptRename(currentList.name, "list");
     if (!name) return;
     await invoke("rename_shopping_list_cmd", { id: listId, name });
     await loadLists();
@@ -101,15 +101,15 @@ export function ShoppingView({ onError }: { onError: (msg: string) => void }) {
 
   async function deleteList() {
     if (!listId || !currentList) return;
-    if (!confirmDelete(`list “${currentList.name}”`)) return;
+    if (!(await confirmDelete(`list “${currentList.name}”`))) return;
     await invoke("delete_shopping_list_cmd", { id: listId });
     await loadLists();
   }
 
   async function setBudget() {
     if (!listId) return;
-    const input = window.prompt(
-      "Budget limit (empty = no budget)",
+    const input = await promptText(
+      "Budget limit (leave empty for no budget)",
       currentList?.budget_limit != null
         ? (currentList.budget_limit / 100).toFixed(2)
         : "",
@@ -158,7 +158,7 @@ export function ShoppingView({ onError }: { onError: (msg: string) => void }) {
   }
 
   async function deleteItem(item: ShoppingItem) {
-    if (!confirmDelete(`item “${item.name}”`)) return;
+    if (!(await confirmDelete(`item “${item.name}”`))) return;
     await invoke("delete_shopping_item_cmd", { itemId: item.id });
     if (listId) await loadListData(listId);
   }

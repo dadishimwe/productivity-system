@@ -149,7 +149,7 @@ export function HabitsView({ onError }: { onError: (msg: string) => void }) {
   }
 
   async function renameHabit(h: Habit) {
-    const name = promptRename(h.name, "habit");
+    const name = await promptRename(h.name, "habit");
     if (!name) return;
     await invoke("update_habit_cmd", {
       id: h.id,
@@ -161,7 +161,7 @@ export function HabitsView({ onError }: { onError: (msg: string) => void }) {
   }
 
   async function removeHabit(h: Habit) {
-    if (!confirmDelete(`habit “${h.name}”`)) return;
+    if (!(await confirmDelete(`habit “${h.name}”`))) return;
     await invoke("delete_habit_cmd", { id: h.id });
     await load();
   }

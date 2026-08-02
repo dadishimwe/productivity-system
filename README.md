@@ -38,7 +38,7 @@ After changing SQL or migrations, run `./scripts/prepare-sqlx.sh` again and comm
 
 - `crates/core` — business logic, migrations, outbox, positioning
 - `src-tauri` — thin Tauri IPC wrappers
-- `src` — React UI (board, habits, shopping)
+- `src` — React UI (board, habits, shopping, calendar)
 
 ## Phase 1
 
@@ -48,3 +48,7 @@ After changing SQL or migrations, run `./scripts/prepare-sqlx.sh` again and comm
 ## Phase 2
 
 - **Shopping** — multiple lists with optional budget, line items (qty, unit, price in cents), check-off, running total vs budget, and outbox entries for sync
+
+## Phase 3
+
+- **Calendar** — local calendars and events (epoch ms, all-day support), week view, rename/delete calendars, outbox on writes (Google sync comes later)

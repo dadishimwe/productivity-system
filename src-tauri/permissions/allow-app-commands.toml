@@ -34,4 +34,13 @@ commands.allow = [
   "toggle_shopping_item_cmd",
   "delete_shopping_item_cmd",
   "get_shopping_list_summary_cmd",
+  "ensure_default_calendar_cmd",
+  "list_calendars_cmd",
+  "create_calendar_cmd",
+  "rename_calendar_cmd",
+  "delete_calendar_cmd",
+  "list_events_cmd",
+  "create_event_cmd",
+  "update_event_cmd",
+  "delete_event_cmd",
 ]

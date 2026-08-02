@@ -1,6 +1,6 @@
 use productivity_core::{
-    boards, columns, habit_logs, habits, shopping_items, shopping_lists, create_task,
-    delete_task, init_pool, list_tasks, move_task, AppState,
+    boards, calendars, columns, events, habit_logs, habits, shopping_items, shopping_lists,
+    create_task, delete_task, init_pool, list_tasks, move_task, AppState,
 };
 use serde::Serialize;
 use std::path::PathBuf;
@@ -606,4 +606,177 @@ pub async fn get_shopping_list_summary_cmd(
         .await
         .map_err(map_err)?
         .into())
+}
+
+#[derive(Serialize)]
+pub struct CalendarDto {
+    pub id: String,
+    pub name: String,
+    pub color: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct EventDto {
+    pub id: String,
+    pub calendar_id: String,
+    pub title: String,
+    pub description: Option<String>,
+    pub start_ms: i64,
+    pub end_ms: i64,
+    pub all_day: bool,
+}
+
+impl From<productivity_core::calendars::Calendar> for CalendarDto {
+    fn from(c: productivity_core::calendars::Calendar) -> Self {
+        Self {
+            id: c.id,
+            name: c.name,
+            color: c.color,
+        }
+    }
+}
+
+impl From<productivity_core::events::Event> for EventDto {
+    fn from(e: productivity_core::events::Event) -> Self {
+        Self {
+            id: e.id,
+            calendar_id: e.calendar_id,
+            title: e.title,
+            description: e.description,
+            start_ms: e.start_ms,
+            end_ms: e.end_ms,
+            all_day: e.all_day != 0,
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn ensure_default_calendar_cmd(
+    db_state: State<'_, DbState>,
+) -> tauri::Result<CalendarDto> {
+    let state = app_state(&db_state)?;
+    Ok(calendars::ensure_default_calendar(&state)
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn list_calendars_cmd(
+    db_state: State<'_, DbState>,
+) -> tauri::Result<Vec<CalendarDto>> {
+    let state = app_state(&db_state)?;
+    Ok(calendars::list_calendars(&state)
+        .await
+        .map_err(map_err)?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+#[tauri::command]
+pub async fn create_calendar_cmd(
+    db_state: State<'_, DbState>,
+    name: String,
+    color: Option<String>,
+) -> tauri::Result<CalendarDto> {
+    let state = app_state(&db_state)?;
+    Ok(calendars::create_calendar(&state, &name, color.as_deref())
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn rename_calendar_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+    name: String,
+) -> tauri::Result<CalendarDto> {
+    let state = app_state(&db_state)?;
+    Ok(calendars::rename_calendar(&state, &id, &name)
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn delete_calendar_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    calendars::delete_calendar(&state, &id).await.map_err(map_err)
+}
+
+#[tauri::command]
+pub async fn list_events_cmd(
+    db_state: State<'_, DbState>,
+    calendar_id: String,
+    range_start_ms: i64,
+    range_end_ms: i64,
+) -> tauri::Result<Vec<EventDto>> {
+    let state = app_state(&db_state)?;
+    Ok(events::list_events_in_range(&state, &calendar_id, range_start_ms, range_end_ms)
+        .await
+        .map_err(map_err)?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+#[tauri::command]
+pub async fn create_event_cmd(
+    db_state: State<'_, DbState>,
+    calendar_id: String,
+    title: String,
+    description: Option<String>,
+    start_ms: i64,
+    end_ms: i64,
+    all_day: bool,
+) -> tauri::Result<EventDto> {
+    let state = app_state(&db_state)?;
+    Ok(events::create_event(
+        &state,
+        &calendar_id,
+        &title,
+        description.as_deref(),
+        start_ms,
+        end_ms,
+        all_day,
+    )
+    .await
+    .map_err(map_err)?
+    .into())
+}
+
+#[tauri::command]
+pub async fn update_event_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+    title: String,
+    description: Option<String>,
+    start_ms: i64,
+    end_ms: i64,
+    all_day: bool,
+) -> tauri::Result<EventDto> {
+    let state = app_state(&db_state)?;
+    Ok(events::update_event(
+        &state,
+        &id,
+        &title,
+        description.as_deref(),
+        start_ms,
+        end_ms,
+        all_day,
+    )
+    .await
+    .map_err(map_err)?
+    .into())
+}
+
+#[tauri::command]
+pub async fn delete_event_cmd(db_state: State<'_, DbState>, id: String) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    events::delete_event(&state, &id).await.map_err(map_err)
 }

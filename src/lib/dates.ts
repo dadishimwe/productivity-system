@@ -36,3 +36,35 @@ export function startOfWeek(d: Date): Date {
   x.setDate(x.getDate() - x.getDay());
   return x;
 }
+
+export function startOfDay(d: Date): Date {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+export function weekWindow(anchor: Date): {
+  startMs: number;
+  endMs: number;
+  days: Date[];
+} {
+  const start = startOfWeek(anchor);
+  const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+  const end = addDays(start, 7);
+  return { startMs: start.getTime(), endMs: end.getTime(), days };
+}
+
+export function formatWeekday(d: Date): string {
+  return d.toLocaleDateString(undefined, { weekday: "short" });
+}
+
+export function formatDayLabel(d: Date): string {
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+export function formatTime(ms: number): string {
+  return new Date(ms).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}

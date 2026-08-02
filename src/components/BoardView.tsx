@@ -76,6 +76,7 @@ function ColumnView({
   onRename,
   onDelete,
   onDeleteTask,
+  onError,
 }: {
   column: Column;
   tasks: Task[];
@@ -83,6 +84,7 @@ function ColumnView({
   onRename: (id: string, name: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onDeleteTask: (id: string) => Promise<void>;
+  onError: (msg: string) => void;
 }) {
   const [title, setTitle] = useState("");
   const ids = useMemo(() => tasks.map((t) => t.id), [tasks]);
@@ -110,16 +112,20 @@ function ColumnView({
           <IconButton
             label="Rename"
             onClick={() => {
-              const name = promptRename(column.name, "column");
-              if (name) onRename(column.id, name).catch(() => {});
+              void (async () => {
+                const name = await promptRename(column.name, "column");
+                if (name) await onRename(column.id, name);
+              })().catch((e) => onError(String(e)));
             }}
           />
           <IconButton
             label="Delete"
             onClick={() => {
-              if (confirmDelete(`column “${column.name}”`)) {
-                onDelete(column.id).catch(() => {});
-              }
+              void (async () => {
+                if (await confirmDelete(`column “${column.name}”`)) {
+                  await onDelete(column.id);
+                }
+              })().catch((e) => onError(String(e)));
             }}
           />
         </div>
@@ -202,7 +208,7 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
 
   async function renameBoard() {
     if (!boardId || !currentBoard) return;
-    const name = promptRename(currentBoard.name, "board");
+    const name = await promptRename(currentBoard.name, "board");
     if (!name) return;
     await invoke("rename_board_cmd", { id: boardId, name });
     await loadBoards();
@@ -210,7 +216,7 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
 
   async function deleteBoard() {
     if (!boardId || !currentBoard) return;
-    if (!confirmDelete(`board “${currentBoard.name}”`)) return;
+    if (!(await confirmDelete(`board “${currentBoard.name}”`))) return;
     await invoke("delete_board_cmd", { id: boardId });
     await loadBoards();
   }
@@ -417,6 +423,7 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
                 onRename={renameColumn}
                 onDelete={deleteColumn}
                 onDeleteTask={deleteTask}
+                onError={onError}
               />
             </div>
           ))}
