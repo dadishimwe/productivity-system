@@ -68,3 +68,36 @@ export function formatTime(ms: number): string {
     minute: "2-digit",
   });
 }
+
+export function monthWindow(anchor: Date): {
+  startMs: number;
+  endMs: number;
+  weeks: Date[][];
+  label: string;
+} {
+  const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+  const start = startOfWeek(first);
+  const weeks: Date[][] = [];
+  let cursor = start;
+  for (let w = 0; w < 6; w++) {
+    weeks.push(Array.from({ length: 7 }, (_, i) => addDays(cursor, i)));
+    cursor = addDays(cursor, 7);
+  }
+  const label = first.toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric",
+  });
+  return {
+    startMs: start.getTime(),
+    endMs: cursor.getTime(),
+    weeks,
+    label,
+  };
+}
+
+export function isSameMonth(a: Date, monthAnchor: Date): boolean {
+  return (
+    a.getFullYear() === monthAnchor.getFullYear() &&
+    a.getMonth() === monthAnchor.getMonth()
+  );
+}

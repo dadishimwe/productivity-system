@@ -16,6 +16,7 @@ async fn create_event_writes_outbox() {
         start,
         end,
         false,
+        None,
     )
     .await
     .unwrap();
@@ -41,6 +42,7 @@ async fn delete_calendar_cascades_events_to_outbox() {
         1_700_000_000_000,
         1_700_000_360_000,
         false,
+        None,
     )
     .await
     .unwrap();

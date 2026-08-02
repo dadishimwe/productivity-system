@@ -40,7 +40,10 @@ commands.allow = [
   "rename_calendar_cmd",
   "delete_calendar_cmd",
   "list_events_cmd",
+  "list_occurrences_cmd",
   "create_event_cmd",
   "update_event_cmd",
   "delete_event_cmd",
+  "move_occurrence_cmd",
+  "delete_occurrence_cmd",
 ]

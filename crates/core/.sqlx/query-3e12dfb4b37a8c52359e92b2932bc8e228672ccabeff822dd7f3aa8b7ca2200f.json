@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE events SET\n            title = ?1,\n            description = ?2,\n            start_ms = ?3,\n            end_ms = ?4,\n            all_day = ?5,\n            rrule = ?6,\n            updated_at = ?7\n        WHERE id = ?8 AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "3e12dfb4b37a8c52359e92b2932bc8e228672ccabeff822dd7f3aa8b7ca2200f"
+}

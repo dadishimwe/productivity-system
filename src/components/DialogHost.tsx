@@ -19,7 +19,14 @@ type PromptDialog = {
   resolve: (value: string | null) => void;
 };
 
-type DialogState = ConfirmDialog | PromptDialog | null;
+type ChoiceDialog = {
+  kind: "choice";
+  title: string;
+  options: { id: string; label: string }[];
+  resolve: (value: string | null) => void;
+};
+
+type DialogState = ConfirmDialog | PromptDialog | ChoiceDialog | null;
 
 let setDialogRef: Dispatch<SetStateAction<DialogState>> | null = null;
 
@@ -28,6 +35,8 @@ function openDialog(state: Exclude<DialogState, null>) {
     console.error("DialogHost is not mounted");
     if (state.kind === "confirm") {
       state.resolve(false);
+    } else if (state.kind === "choice") {
+      state.resolve(null);
     } else {
       state.resolve(null);
     }
@@ -48,6 +57,15 @@ export function promptDialog(
 ): Promise<string | null> {
   return new Promise((resolve) => {
     openDialog({ kind: "prompt", title, initial, resolve });
+  });
+}
+
+export function choiceDialog(
+  title: string,
+  options: { id: string; label: string }[],
+): Promise<string | null> {
+  return new Promise((resolve) => {
+    openDialog({ kind: "choice", title, options, resolve });
   });
 }
 
@@ -80,6 +98,12 @@ export function DialogHost() {
     setDialog(null);
   }
 
+  function closeChoice(result: string | null) {
+    if (dialog?.kind !== "choice") return;
+    dialog.resolve(result);
+    setDialog(null);
+  }
+
   function onPromptSubmit(e: FormEvent) {
     e.preventDefault();
     if (dialog?.kind !== "prompt") return;
@@ -95,6 +119,7 @@ export function DialogHost() {
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) {
           if (dialog.kind === "confirm") closeConfirm(false);
+          else if (dialog.kind === "choice") closeChoice(null);
           else closePrompt(null);
         }
       }}
@@ -124,6 +149,31 @@ export function DialogHost() {
                 onClick={() => closeConfirm(true)}
               >
                 Delete
+              </button>
+            </div>
+          </>
+        ) : dialog.kind === "choice" ? (
+          <>
+            <p id="dialog-title" className="text-sm text-zinc-100">
+              {dialog.title}
+            </p>
+            <div className="mt-4 flex flex-col gap-2">
+              {dialog.options.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  className="rounded border border-zinc-600 px-3 py-2 text-left text-sm hover:bg-zinc-800"
+                  onClick={() => closeChoice(opt.id)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="mt-1 rounded px-3 py-1 text-sm text-zinc-400"
+                onClick={() => closeChoice(null)}
+              >
+                Cancel
               </button>
             </div>
           </>

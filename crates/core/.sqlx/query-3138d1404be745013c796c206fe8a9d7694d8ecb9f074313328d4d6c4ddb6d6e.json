@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                id as \"id!\",\n                event_id as \"event_id!\",\n                original_start_ms as \"original_start_ms!\",\n                override_start_ms,\n                override_end_ms,\n                cancelled as \"cancelled!\",\n                created_at as \"created_at!\",\n                updated_at as \"updated_at!\"\n            FROM event_exceptions\n            WHERE event_id = ?1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "event_id!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "original_start_ms!",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_start_ms",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "override_end_ms",
+        "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "cancelled!",
+        "ordinal": 5,
+        "type_info": "Integer"
+      },
+      {
+        "name": "created_at!",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at!",
+        "ordinal": 7,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3138d1404be745013c796c206fe8a9d7694d8ecb9f074313328d4d6c4ddb6d6e"
+}

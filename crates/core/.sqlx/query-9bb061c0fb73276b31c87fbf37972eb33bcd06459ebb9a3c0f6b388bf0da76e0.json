@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE event_exceptions SET\n                override_start_ms = ?1,\n                override_end_ms = ?2,\n                cancelled = ?3,\n                updated_at = ?4\n            WHERE id = ?5\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "9bb061c0fb73276b31c87fbf37972eb33bcd06459ebb9a3c0f6b388bf0da76e0"
+}

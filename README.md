@@ -51,4 +51,4 @@ After changing SQL or migrations, run `./scripts/prepare-sqlx.sh` again and comm
 
 ## Phase 3
 
-- **Calendar** — local calendars and events (epoch ms, all-day support), week view, rename/delete calendars, outbox on writes (Google sync comes later)
+- **Calendar** — local calendars and events; `list_occurrences` expands `RRULE` via the `rrule` crate; `event_exceptions` for move/delete-this-instance; week + month views, edit modal, drag-to-reschedule with scope prompts; outbox includes `event_exception` rows

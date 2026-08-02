@@ -616,14 +616,45 @@ pub struct CalendarDto {
 }
 
 #[derive(Serialize)]
-pub struct EventDto {
-    pub id: String,
+pub struct OccurrenceDto {
+    pub event_id: String,
     pub calendar_id: String,
     pub title: String,
     pub description: Option<String>,
+    pub original_start_ms: i64,
     pub start_ms: i64,
     pub end_ms: i64,
     pub all_day: bool,
+    pub recurring: bool,
+}
+
+impl From<productivity_core::occurrences::EventOccurrence> for OccurrenceDto {
+    fn from(o: productivity_core::occurrences::EventOccurrence) -> Self {
+        Self {
+            event_id: o.event_id,
+            calendar_id: o.calendar_id,
+            title: o.title,
+            description: o.description,
+            original_start_ms: o.original_start_ms,
+            start_ms: o.start_ms,
+            end_ms: o.end_ms,
+            all_day: o.all_day,
+            recurring: o.recurring,
+        }
+    }
+}
+
+fn parse_occurrence_scope(scope: &str) -> tauri::Result<productivity_core::occurrences::OccurrenceScope> {
+    use productivity_core::occurrences::OccurrenceScope;
+    match scope {
+        "this" => Ok(OccurrenceScope::This),
+        "this_and_following" => Ok(OccurrenceScope::ThisAndFollowing),
+        "all" => Ok(OccurrenceScope::All),
+        _ => Err(tauri::Error::Io(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "invalid occurrence scope",
+        ))),
+    }
 }
 
 impl From<productivity_core::calendars::Calendar> for CalendarDto {
@@ -636,6 +667,18 @@ impl From<productivity_core::calendars::Calendar> for CalendarDto {
     }
 }
 
+#[derive(Serialize)]
+pub struct EventDto {
+    pub id: String,
+    pub calendar_id: String,
+    pub title: String,
+    pub description: Option<String>,
+    pub start_ms: i64,
+    pub end_ms: i64,
+    pub all_day: bool,
+    pub rrule: Option<String>,
+}
+
 impl From<productivity_core::events::Event> for EventDto {
     fn from(e: productivity_core::events::Event) -> Self {
         Self {
@@ -646,6 +689,7 @@ impl From<productivity_core::events::Event> for EventDto {
             start_ms: e.start_ms,
             end_ms: e.end_ms,
             all_day: e.all_day != 0,
+            rrule: e.rrule,
         }
     }
 }
@@ -710,6 +754,22 @@ pub async fn delete_calendar_cmd(
 }
 
 #[tauri::command]
+pub async fn list_occurrences_cmd(
+    db_state: State<'_, DbState>,
+    calendar_id: String,
+    range_start_ms: i64,
+    range_end_ms: i64,
+) -> tauri::Result<Vec<OccurrenceDto>> {
+    let state = app_state(&db_state)?;
+    Ok(events::list_occurrences(&state, &calendar_id, range_start_ms, range_end_ms)
+        .await
+        .map_err(map_err)?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+#[tauri::command]
 pub async fn list_events_cmd(
     db_state: State<'_, DbState>,
     calendar_id: String,
@@ -734,6 +794,7 @@ pub async fn create_event_cmd(
     start_ms: i64,
     end_ms: i64,
     all_day: bool,
+    rrule: Option<String>,
 ) -> tauri::Result<EventDto> {
     let state = app_state(&db_state)?;
     Ok(events::create_event(
@@ -744,6 +805,7 @@ pub async fn create_event_cmd(
         start_ms,
         end_ms,
         all_day,
+        rrule.as_deref(),
     )
     .await
     .map_err(map_err)?
@@ -759,6 +821,7 @@ pub async fn update_event_cmd(
     start_ms: i64,
     end_ms: i64,
     all_day: bool,
+    rrule: Option<String>,
 ) -> tauri::Result<EventDto> {
     let state = app_state(&db_state)?;
     Ok(events::update_event(
@@ -769,6 +832,7 @@ pub async fn update_event_cmd(
         start_ms,
         end_ms,
         all_day,
+        rrule.as_deref(),
     )
     .await
     .map_err(map_err)?
@@ -779,4 +843,44 @@ pub async fn update_event_cmd(
 pub async fn delete_event_cmd(db_state: State<'_, DbState>, id: String) -> tauri::Result<()> {
     let state = app_state(&db_state)?;
     events::delete_event(&state, &id).await.map_err(map_err)
+}
+
+#[tauri::command]
+pub async fn move_occurrence_cmd(
+    db_state: State<'_, DbState>,
+    event_id: String,
+    original_start_ms: i64,
+    new_start_ms: i64,
+    new_end_ms: i64,
+    scope: String,
+) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    events::move_occurrence(
+        &state,
+        &event_id,
+        original_start_ms,
+        new_start_ms,
+        new_end_ms,
+        parse_occurrence_scope(&scope)?,
+    )
+    .await
+    .map_err(map_err)
+}
+
+#[tauri::command]
+pub async fn delete_occurrence_cmd(
+    db_state: State<'_, DbState>,
+    event_id: String,
+    original_start_ms: i64,
+    scope: String,
+) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    events::delete_occurrence(
+        &state,
+        &event_id,
+        original_start_ms,
+        parse_occurrence_scope(&scope)?,
+    )
+    .await
+    .map_err(map_err)
 }
