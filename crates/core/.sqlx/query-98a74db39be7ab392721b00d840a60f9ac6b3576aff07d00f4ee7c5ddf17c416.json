@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT id as \"id!\" FROM shopping_items\n        WHERE list_id = ?1 AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "98a74db39be7ab392721b00d840a60f9ac6b3576aff07d00f4ee7c5ddf17c416"
+}

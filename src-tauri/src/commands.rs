@@ -1,5 +1,6 @@
 use productivity_core::{
-    boards, columns, habit_logs, habits, create_task, init_pool, list_tasks, move_task, AppState,
+    boards, columns, habit_logs, habits, shopping_items, shopping_lists, create_task,
+    delete_task, init_pool, list_tasks, move_task, AppState,
 };
 use serde::Serialize;
 use std::path::PathBuf;
@@ -30,8 +31,8 @@ fn db_path(app: &AppHandle) -> tauri::Result<PathBuf> {
     Ok(dir.join("productivity.db"))
 }
 
-pub async fn init_db(app: AppHandle, db_state: State<'_, DbState>) -> tauri::Result<()> {
-    let path = db_path(&app)?;
+pub async fn init_db(app: &AppHandle, db_state: State<'_, DbState>) -> tauri::Result<()> {
+    let path = db_path(app)?;
     let state = init_pool(&path).await.map_err(map_err)?;
     *db_state.0.lock().unwrap() = Some(state);
     Ok(())
@@ -378,4 +379,231 @@ pub async fn list_habit_logs_cmd(
         .into_iter()
         .map(Into::into)
         .collect())
+}
+
+#[tauri::command]
+pub async fn delete_task_cmd(db_state: State<'_, DbState>, task_id: String) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    delete_task(&state, &task_id).await.map_err(map_err)
+}
+
+#[derive(Serialize)]
+pub struct ShoppingListDto {
+    pub id: String,
+    pub name: String,
+    pub budget_limit: Option<i64>,
+}
+
+#[derive(Serialize)]
+pub struct ShoppingItemDto {
+    pub id: String,
+    pub list_id: String,
+    pub name: String,
+    pub qty: f64,
+    pub unit: Option<String>,
+    pub unit_price: Option<i64>,
+    pub checked: bool,
+    pub category: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct ListSummaryDto {
+    pub total_cents: i64,
+    pub item_count: i32,
+    pub checked_count: i32,
+}
+
+impl From<productivity_core::shopping_lists::ShoppingList> for ShoppingListDto {
+    fn from(l: productivity_core::shopping_lists::ShoppingList) -> Self {
+        Self {
+            id: l.id,
+            name: l.name,
+            budget_limit: l.budget_limit,
+        }
+    }
+}
+
+impl From<productivity_core::shopping_items::ShoppingItem> for ShoppingItemDto {
+    fn from(i: productivity_core::shopping_items::ShoppingItem) -> Self {
+        Self {
+            id: i.id,
+            list_id: i.list_id,
+            name: i.name,
+            qty: i.qty,
+            unit: i.unit,
+            unit_price: i.unit_price,
+            checked: i.checked != 0,
+            category: i.category,
+        }
+    }
+}
+
+impl From<productivity_core::shopping_items::ListSummary> for ListSummaryDto {
+    fn from(s: productivity_core::shopping_items::ListSummary) -> Self {
+        Self {
+            total_cents: s.total_cents,
+            item_count: s.item_count,
+            checked_count: s.checked_count,
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn create_shopping_list_cmd(
+    db_state: State<'_, DbState>,
+    name: String,
+    budget_limit: Option<i64>,
+) -> tauri::Result<ShoppingListDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_lists::create_list(&state, &name, budget_limit)
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn list_shopping_lists_cmd(
+    db_state: State<'_, DbState>,
+) -> tauri::Result<Vec<ShoppingListDto>> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_lists::list_lists(&state)
+        .await
+        .map_err(map_err)?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+#[tauri::command]
+pub async fn rename_shopping_list_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+    name: String,
+) -> tauri::Result<ShoppingListDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_lists::rename_list(&state, &id, &name)
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn set_shopping_budget_cmd(
+    db_state: State<'_, DbState>,
+    list_id: String,
+    budget_limit: Option<i64>,
+) -> tauri::Result<ShoppingListDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_lists::set_budget(&state, &list_id, budget_limit)
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn delete_shopping_list_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    shopping_lists::delete_list(&state, &id).await.map_err(map_err)
+}
+
+#[tauri::command]
+pub async fn create_shopping_item_cmd(
+    db_state: State<'_, DbState>,
+    list_id: String,
+    name: String,
+    qty: f64,
+    unit: Option<String>,
+    unit_price: Option<i64>,
+    category: Option<String>,
+) -> tauri::Result<ShoppingItemDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_items::create_item(
+        &state,
+        &list_id,
+        &name,
+        qty,
+        unit.as_deref(),
+        unit_price,
+        category.as_deref(),
+    )
+    .await
+    .map_err(map_err)?
+    .into())
+}
+
+#[tauri::command]
+pub async fn list_shopping_items_cmd(
+    db_state: State<'_, DbState>,
+    list_id: String,
+) -> tauri::Result<Vec<ShoppingItemDto>> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_items::list_items(&state, &list_id)
+        .await
+        .map_err(map_err)?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+#[tauri::command]
+pub async fn update_shopping_item_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+    name: String,
+    qty: f64,
+    unit: Option<String>,
+    unit_price: Option<i64>,
+    category: Option<String>,
+) -> tauri::Result<ShoppingItemDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_items::update_item(
+        &state,
+        &id,
+        &name,
+        qty,
+        unit.as_deref(),
+        unit_price,
+        category.as_deref(),
+    )
+    .await
+    .map_err(map_err)?
+    .into())
+}
+
+#[tauri::command]
+pub async fn toggle_shopping_item_cmd(
+    db_state: State<'_, DbState>,
+    item_id: String,
+) -> tauri::Result<ShoppingItemDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_items::toggle_checked(&state, &item_id)
+        .await
+        .map_err(map_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn delete_shopping_item_cmd(
+    db_state: State<'_, DbState>,
+    item_id: String,
+) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    shopping_items::delete_item(&state, &item_id)
+        .await
+        .map_err(map_err)
+}
+
+#[tauri::command]
+pub async fn get_shopping_list_summary_cmd(
+    db_state: State<'_, DbState>,
+    list_id: String,
+) -> tauri::Result<ListSummaryDto> {
+    let state = app_state(&db_state)?;
+    Ok(shopping_items::get_list_summary(&state, &list_id)
+        .await
+        .map_err(map_err)?
+        .into())
 }

@@ -8,10 +8,12 @@ pub mod habits;
 pub mod outbox;
 pub mod positioning;
 pub mod tags;
+pub mod shopping_items;
+pub mod shopping_lists;
 pub mod tasks;
 
 #[doc(hidden)]
 pub mod test_support;
 
 pub use db::{init_pool, AppState};
-pub use tasks::{create as create_task, list as list_tasks, move_task, Task};
+pub use tasks::{create as create_task, delete_task, list as list_tasks, move_task, Task};

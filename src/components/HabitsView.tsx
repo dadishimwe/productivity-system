@@ -6,6 +6,8 @@ import {
   lastMonthsRange,
   startOfWeek,
 } from "../lib/dates";
+import { confirmDelete, promptRename } from "../lib/dialogs";
+import { IconButton } from "./IconButton";
 
 type Habit = {
   id: string;
@@ -146,6 +148,24 @@ export function HabitsView({ onError }: { onError: (msg: string) => void }) {
     await load();
   }
 
+  async function renameHabit(h: Habit) {
+    const name = promptRename(h.name, "habit");
+    if (!name) return;
+    await invoke("update_habit_cmd", {
+      id: h.id,
+      name,
+      color: h.color,
+      targetFrequency: h.target_frequency,
+    });
+    await load();
+  }
+
+  async function removeHabit(h: Habit) {
+    if (!confirmDelete(`habit “${h.name}”`)) return;
+    await invoke("delete_habit_cmd", { id: h.id });
+    await load();
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex gap-2">
@@ -170,9 +190,22 @@ export function HabitsView({ onError }: { onError: (msg: string) => void }) {
 
       {habits.map((h) => (
         <section key={h.id} className="space-y-2">
-          <h3 className="text-sm font-medium" style={{ color: h.color ?? undefined }}>
-            {h.name}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3
+              className="text-sm font-medium"
+              style={{ color: h.color ?? undefined }}
+            >
+              {h.name}
+            </h3>
+            <IconButton
+              label="Rename"
+              onClick={() => renameHabit(h).catch((e) => onError(String(e)))}
+            />
+            <IconButton
+              label="Delete"
+              onClick={() => removeHabit(h).catch((e) => onError(String(e)))}
+            />
+          </div>
           <Heatmap
             habit={h}
             logs={logsByHabit[h.id] ?? new Map()}

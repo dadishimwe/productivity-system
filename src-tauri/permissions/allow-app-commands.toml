@@ -1,6 +1,6 @@
 [[permission]]
-identifier = "allow-phase1-commands"
-description = "Phase 1 IPC commands"
+identifier = "allow-app-commands"
+description = "All IPC commands"
 commands.allow = [
   "create_board_cmd",
   "list_boards_cmd",
@@ -15,6 +15,7 @@ commands.allow = [
   "create_task_cmd",
   "list_tasks_cmd",
   "move_task_cmd",
+  "delete_task_cmd",
   "create_habit_cmd",
   "list_habits_cmd",
   "update_habit_cmd",
@@ -22,4 +23,15 @@ commands.allow = [
   "log_habit_cmd",
   "unlog_habit_cmd",
   "list_habit_logs_cmd",
+  "create_shopping_list_cmd",
+  "list_shopping_lists_cmd",
+  "rename_shopping_list_cmd",
+  "set_shopping_budget_cmd",
+  "delete_shopping_list_cmd",
+  "create_shopping_item_cmd",
+  "list_shopping_items_cmd",
+  "update_shopping_item_cmd",
+  "toggle_shopping_item_cmd",
+  "delete_shopping_item_cmd",
+  "get_shopping_list_summary_cmd",
 ]

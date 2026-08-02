@@ -17,7 +17,9 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { invoke } from "@tauri-apps/api/core";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { confirmDelete, promptRename } from "../lib/dialogs";
 import { positionBetween } from "../lib/positioning";
+import { IconButton } from "./IconButton";
 
 export type Board = { id: string; name: string; position: number };
 export type Column = {
@@ -34,7 +36,13 @@ export type Task = {
   status: string;
 };
 
-function SortableTask({ task }: { task: Task }) {
+function SortableTask({
+  task,
+  onDelete,
+}: {
+  task: Task;
+  onDelete: (id: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id, data: { type: "task", task } });
 
@@ -47,11 +55,16 @@ function SortableTask({ task }: { task: Task }) {
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className="cursor-grab rounded border border-zinc-700 bg-zinc-800/80 px-2 py-1.5 text-sm active:cursor-grabbing"
+      className="flex items-center gap-1 rounded border border-zinc-700 bg-zinc-800/80 px-2 py-1.5 text-sm"
     >
-      {task.title}
+      <span
+        className="min-w-0 flex-1 cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        {task.title}
+      </span>
+      <IconButton label="Delete" onClick={() => onDelete(task.id)} />
     </div>
   );
 }
@@ -60,14 +73,23 @@ function ColumnView({
   column,
   tasks,
   onAddTask,
+  onRename,
+  onDelete,
+  onDeleteTask,
 }: {
   column: Column;
   tasks: Task[];
   onAddTask: (columnId: string, title: string) => Promise<void>;
+  onRename: (id: string, name: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  onDeleteTask: (id: string) => Promise<void>;
 }) {
   const [title, setTitle] = useState("");
   const ids = useMemo(() => tasks.map((t) => t.id), [tasks]);
-  const { setNodeRef } = useDroppable({ id: column.id, data: { type: "column" } });
+  const { setNodeRef } = useDroppable({
+    id: column.id,
+    data: { type: "column" },
+  });
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -82,13 +104,30 @@ function ColumnView({
       className="flex w-64 shrink-0 flex-col rounded-lg border border-zinc-800 bg-zinc-900/50"
       data-column-id={column.id}
     >
-      <h3 className="border-b border-zinc-800 px-3 py-2 text-sm font-medium">
-        {column.name}
-      </h3>
+      <div className="flex items-center justify-between gap-1 border-b border-zinc-800 px-2 py-2">
+        <h3 className="truncate text-sm font-medium">{column.name}</h3>
+        <div className="flex shrink-0">
+          <IconButton
+            label="Rename"
+            onClick={() => {
+              const name = promptRename(column.name, "column");
+              if (name) onRename(column.id, name).catch(() => {});
+            }}
+          />
+          <IconButton
+            label="Delete"
+            onClick={() => {
+              if (confirmDelete(`column “${column.name}”`)) {
+                onDelete(column.id).catch(() => {});
+              }
+            }}
+          />
+        </div>
+      </div>
       <SortableContext items={ids} strategy={verticalListSortingStrategy}>
         <div className="flex min-h-[120px] flex-col gap-2 p-2">
           {tasks.map((t) => (
-            <SortableTask key={t.id} task={t} />
+            <SortableTask key={t.id} task={t} onDelete={onDeleteTask} />
           ))}
         </div>
       </SortableContext>
@@ -117,6 +156,8 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
+  const currentBoard = boards.find((b) => b.id === boardId);
+
   const loadBoards = useCallback(async () => {
     const list = await invoke<Board[]>("list_boards_cmd");
     setBoards(list);
@@ -131,20 +172,17 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
     );
   }, []);
 
-  const loadBoardData = useCallback(
-    async (id: string) => {
-      const cols = await invoke<Column[]>("list_columns_cmd", { boardId: id });
-      setColumns(cols);
-      const map: Record<string, Task[]> = {};
-      for (const col of cols) {
-        map[col.id] = await invoke<Task[]>("list_tasks_cmd", {
-          columnId: col.id,
-        });
-      }
-      setTasksByColumn(map);
-    },
-    [],
-  );
+  const loadBoardData = useCallback(async (id: string) => {
+    const cols = await invoke<Column[]>("list_columns_cmd", { boardId: id });
+    setColumns(cols);
+    const map: Record<string, Task[]> = {};
+    for (const col of cols) {
+      map[col.id] = await invoke<Task[]>("list_tasks_cmd", {
+        columnId: col.id,
+      });
+    }
+    setTasksByColumn(map);
+  }, []);
 
   useEffect(() => {
     loadBoards().catch((e) => onError(String(e)));
@@ -162,6 +200,21 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
     await loadBoards();
   }
 
+  async function renameBoard() {
+    if (!boardId || !currentBoard) return;
+    const name = promptRename(currentBoard.name, "board");
+    if (!name) return;
+    await invoke("rename_board_cmd", { id: boardId, name });
+    await loadBoards();
+  }
+
+  async function deleteBoard() {
+    if (!boardId || !currentBoard) return;
+    if (!confirmDelete(`board “${currentBoard.name}”`)) return;
+    await invoke("delete_board_cmd", { id: boardId });
+    await loadBoards();
+  }
+
   async function createColumn() {
     if (!boardId || !newColumnName.trim()) return;
     await invoke("create_column_cmd", {
@@ -174,6 +227,21 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
 
   async function addTask(columnId: string, title: string) {
     await invoke("create_task_cmd", { columnId, title });
+    if (boardId) await loadBoardData(boardId);
+  }
+
+  async function renameColumn(id: string, name: string) {
+    await invoke("rename_column_cmd", { id, name });
+    if (boardId) await loadBoardData(boardId);
+  }
+
+  async function deleteColumn(id: string) {
+    await invoke("delete_column_cmd", { id });
+    if (boardId) await loadBoardData(boardId);
+  }
+
+  async function deleteTask(taskId: string) {
+    await invoke("delete_task_cmd", { taskId });
     if (boardId) await loadBoardData(boardId);
   }
 
@@ -292,6 +360,12 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
             </option>
           ))}
         </select>
+        {boardId && (
+          <>
+            <IconButton label="Rename" onClick={() => renameBoard().catch((e) => onError(String(e)))} />
+            <IconButton label="Delete" onClick={() => deleteBoard().catch((e) => onError(String(e)))} />
+          </>
+        )}
         <input
           className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm"
           placeholder="New board"
@@ -340,6 +414,9 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
                 column={col}
                 tasks={tasksByColumn[col.id] ?? []}
                 onAddTask={addTask}
+                onRename={renameColumn}
+                onDelete={deleteColumn}
+                onDeleteTask={deleteTask}
               />
             </div>
           ))}

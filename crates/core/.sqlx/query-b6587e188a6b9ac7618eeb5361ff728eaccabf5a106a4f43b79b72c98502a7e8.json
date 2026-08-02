@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE shopping_lists SET deleted_at = ?1, updated_at = ?1 WHERE id = ?2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "b6587e188a6b9ac7618eeb5361ff728eaccabf5a106a4f43b79b72c98502a7e8"
+}

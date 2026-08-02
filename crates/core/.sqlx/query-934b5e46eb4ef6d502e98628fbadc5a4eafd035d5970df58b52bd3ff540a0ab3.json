@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE shopping_lists SET budget_limit = ?1, updated_at = ?2 WHERE id = ?3 AND deleted_at IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "934b5e46eb4ef6d502e98628fbadc5a4eafd035d5970df58b52bd3ff540a0ab3"
+}

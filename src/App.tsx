@@ -1,31 +1,34 @@
 import { useState } from "react";
 import { BoardView } from "./components/BoardView";
 import { HabitsView } from "./components/HabitsView";
+import { ShoppingView } from "./components/ShoppingView";
 
-type Tab = "board" | "habits";
+type Tab = "board" | "habits" | "shopping";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("board");
   const [error, setError] = useState<string | null>(null);
+
+  const tabClass = (t: Tab) =>
+    `rounded px-3 py-1 text-sm ${tab === t ? "bg-zinc-100 text-zinc-900" : "text-zinc-400"}`;
 
   return (
     <main className="mx-auto max-w-6xl p-6">
       <header className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold tracking-tight">Productivity</h1>
         <nav className="flex gap-1 rounded-lg border border-zinc-800 p-1">
-          <button
-            type="button"
-            className={`rounded px-3 py-1 text-sm ${tab === "board" ? "bg-zinc-100 text-zinc-900" : "text-zinc-400"}`}
-            onClick={() => setTab("board")}
-          >
+          <button type="button" className={tabClass("board")} onClick={() => setTab("board")}>
             Board
+          </button>
+          <button type="button" className={tabClass("habits")} onClick={() => setTab("habits")}>
+            Habits
           </button>
           <button
             type="button"
-            className={`rounded px-3 py-1 text-sm ${tab === "habits" ? "bg-zinc-100 text-zinc-900" : "text-zinc-400"}`}
-            onClick={() => setTab("habits")}
+            className={tabClass("shopping")}
+            onClick={() => setTab("shopping")}
           >
-            Habits
+            Shopping
           </button>
         </nav>
       </header>
@@ -36,11 +39,9 @@ export default function App() {
         </p>
       )}
 
-      {tab === "board" ? (
-        <BoardView onError={setError} />
-      ) : (
-        <HabitsView onError={setError} />
-      )}
+      {tab === "board" && <BoardView onError={setError} />}
+      {tab === "habits" && <HabitsView onError={setError} />}
+      {tab === "shopping" && <ShoppingView onError={setError} />}
     </main>
   );
 }

@@ -1,11 +1,15 @@
 mod commands;
 
 use commands::{
-    create_board_cmd, create_column_cmd, create_habit_cmd, create_task_cmd, delete_board_cmd,
-    delete_column_cmd, delete_habit_cmd, init_db, list_boards_cmd, list_columns_cmd,
-    list_habit_logs_cmd, list_habits_cmd, list_tasks_cmd, log_habit_cmd, move_task_cmd,
-    rename_board_cmd, rename_column_cmd, reorder_board_cmd, reorder_column_cmd, unlog_habit_cmd,
-    update_habit_cmd, DbState,
+    create_board_cmd, create_column_cmd, create_habit_cmd, create_shopping_item_cmd,
+    create_shopping_list_cmd, create_task_cmd, delete_board_cmd, delete_column_cmd,
+    delete_habit_cmd, delete_shopping_item_cmd, delete_shopping_list_cmd, delete_task_cmd,
+    get_shopping_list_summary_cmd, init_db, list_boards_cmd, list_columns_cmd,
+    list_habit_logs_cmd, list_habits_cmd, list_shopping_items_cmd, list_shopping_lists_cmd,
+    list_tasks_cmd, log_habit_cmd, move_task_cmd, rename_board_cmd, rename_column_cmd,
+    rename_shopping_list_cmd, reorder_board_cmd, reorder_column_cmd, set_shopping_budget_cmd,
+    toggle_shopping_item_cmd, unlog_habit_cmd, update_habit_cmd, update_shopping_item_cmd,
+    DbState,
 };
 use std::sync::Mutex;
 use tauri::Manager;
@@ -19,7 +23,7 @@ pub fn run() {
             let handle = app.handle().clone();
             tauri::async_runtime::block_on(async move {
                 let db_state = handle.state::<DbState>();
-                init_db(handle, db_state)
+                init_db(&handle, db_state)
                     .await
                     .expect("failed to init database");
             });
@@ -39,6 +43,7 @@ pub fn run() {
             create_task_cmd,
             list_tasks_cmd,
             move_task_cmd,
+            delete_task_cmd,
             create_habit_cmd,
             list_habits_cmd,
             update_habit_cmd,
@@ -46,6 +51,17 @@ pub fn run() {
             log_habit_cmd,
             unlog_habit_cmd,
             list_habit_logs_cmd,
+            create_shopping_list_cmd,
+            list_shopping_lists_cmd,
+            rename_shopping_list_cmd,
+            set_shopping_budget_cmd,
+            delete_shopping_list_cmd,
+            create_shopping_item_cmd,
+            list_shopping_items_cmd,
+            update_shopping_item_cmd,
+            toggle_shopping_item_cmd,
+            delete_shopping_item_cmd,
+            get_shopping_list_summary_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO shopping_items (\n            id, list_id, name, qty, unit, unit_price, checked, category,\n            created_at, updated_at, deleted_at\n        )\n        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, NULL)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "e6bc0b4d7a14a23f58ed0e3a22d40f8b8e810c11cb5a5b4932c55a57cea31d9f"
+}

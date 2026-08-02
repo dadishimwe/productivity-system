@@ -232,6 +232,40 @@ pub async fn move_task(
     Ok(task)
 }
 
+pub async fn delete_task(state: &AppState, task_id: &str) -> Result<()> {
+    let mut conn = state.pool.acquire().await?;
+    let mut tx = conn.begin().await?;
+    let now = envelope::now_ms();
+
+    let task = fetch_by_id_conn(&mut tx, task_id)
+        .await?
+        .ok_or_else(|| crate::error::CoreError::Message("task not found".into()))?;
+
+    sqlx::query!(
+        r#"UPDATE tasks SET deleted_at = ?1, updated_at = ?1 WHERE id = ?2"#,
+        now,
+        task_id
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    let mut deleted = task.clone();
+    deleted.deleted_at = Some(now);
+    deleted.updated_at = now;
+    let payload = serde_json::to_string(&deleted)?;
+    record_change_conn(
+        &mut tx,
+        ChangeOp::Delete,
+        "task",
+        task_id,
+        Some(&payload),
+    )
+    .await?;
+
+    tx.commit().await?;
+    Ok(())
+}
+
 pub async fn insert_between(
     state: &AppState,
     column_id: &str,

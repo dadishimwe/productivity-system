@@ -28,7 +28,7 @@ fn insert_at_end_after_last() {
 #[test]
 fn repeated_midpoints_trigger_rebalance() {
     let mut low = 0.0_f64;
-    let mut high = 1.0_f64;
+    let high = 1.0_f64;
     loop {
         match try_position_between(low, high) {
             Ok(mid) => {
