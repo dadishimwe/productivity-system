@@ -1,6 +1,6 @@
 use productivity_core::{
     boards, calendars, columns, events, habit_logs, habits, shopping_items, shopping_lists,
-    create_task, delete_task, init_pool, list_tasks, move_task, AppState,
+    create_task, delete_task, init_pool, list_tasks, move_task, update_task, AppState,
 };
 use serde::Serialize;
 use std::path::PathBuf;
@@ -58,7 +58,9 @@ pub struct TaskDto {
     pub id: String,
     pub column_id: String,
     pub title: String,
+    pub description: Option<String>,
     pub position: f64,
+    pub due_date: Option<i64>,
     pub status: String,
 }
 
@@ -105,7 +107,9 @@ impl From<productivity_core::Task> for TaskDto {
             id: t.id,
             column_id: t.column_id,
             title: t.title,
+            description: t.description,
             position: t.position,
+            due_date: t.due_date,
             status: t.status,
         }
     }
@@ -379,6 +383,29 @@ pub async fn list_habit_logs_cmd(
         .into_iter()
         .map(Into::into)
         .collect())
+}
+
+#[tauri::command]
+pub async fn update_task_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+    title: String,
+    description: Option<String>,
+    due_date: Option<i64>,
+    status: String,
+) -> tauri::Result<TaskDto> {
+    let state = app_state(&db_state)?;
+    Ok(update_task(
+        &state,
+        &id,
+        &title,
+        description.as_deref(),
+        due_date,
+        &status,
+    )
+    .await
+    .map_err(map_err)?
+    .into())
 }
 
 #[tauri::command]

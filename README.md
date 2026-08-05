@@ -42,7 +42,7 @@ After changing SQL or migrations, run `./scripts/prepare-sqlx.sh` again and comm
 
 ## Phase 1
 
-- **Board** — multiple boards, columns, drag-and-drop tasks (`dnd-kit`), fractional positions via `move_task_cmd`; rename/delete boards, columns, and tasks from the UI
+- **Board** — multiple boards, columns, drag-and-drop tasks (`dnd-kit`), fractional positions via `move_task_cmd`; board tabs, task drawer (description, due date, status), column/card elevation, ⋮ menus, search filter; rename/delete boards, columns, and tasks
 - **Habits** — habit list + GitHub-style heatmap; click toggles `log_habit_cmd` / `unlog_habit_cmd`; rename/delete habits
 
 ## Phase 2

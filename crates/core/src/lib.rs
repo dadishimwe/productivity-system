@@ -20,4 +20,4 @@ pub mod tasks;
 pub mod test_support;
 
 pub use db::{init_pool, AppState};
-pub use tasks::{create as create_task, delete_task, list as list_tasks, move_task, Task};
+pub use tasks::{create as create_task, delete_task, list as list_tasks, move_task, update_task, Task};

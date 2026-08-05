@@ -232,6 +232,61 @@ pub async fn move_task(
     Ok(task)
 }
 
+pub async fn update_task(
+    state: &AppState,
+    task_id: &str,
+    title: &str,
+    description: Option<&str>,
+    due_date: Option<i64>,
+    status: &str,
+) -> Result<Task> {
+    let mut conn = state.pool.acquire().await?;
+    let mut tx = conn.begin().await?;
+    let now = envelope::now_ms();
+
+    let updated = sqlx::query!(
+        r#"
+        UPDATE tasks SET
+            title = ?1,
+            description = ?2,
+            due_date = ?3,
+            status = ?4,
+            updated_at = ?5
+        WHERE id = ?6 AND deleted_at IS NULL
+        "#,
+        title,
+        description,
+        due_date,
+        status,
+        now,
+        task_id
+    )
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+
+    if updated == 0 {
+        return Err(crate::error::CoreError::Message("task not found".into()));
+    }
+
+    let task = fetch_by_id_conn(&mut tx, task_id)
+        .await?
+        .ok_or_else(|| crate::error::CoreError::Message("task not found".into()))?;
+
+    let payload = serde_json::to_string(&task)?;
+    record_change_conn(
+        &mut tx,
+        ChangeOp::Update,
+        "task",
+        task_id,
+        Some(&payload),
+    )
+    .await?;
+
+    tx.commit().await?;
+    Ok(task)
+}
+
 pub async fn delete_task(state: &AppState, task_id: &str) -> Result<()> {
     let mut conn = state.pool.acquire().await?;
     let mut tx = conn.begin().await?;

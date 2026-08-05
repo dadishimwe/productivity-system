@@ -42,3 +42,5 @@ export async function promptText(
 ): Promise<string | null> {
   return promptDialog(title, initial);
 }
+
+export { promptDialog };

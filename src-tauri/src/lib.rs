@@ -11,7 +11,7 @@ use commands::{
     log_habit_cmd, move_occurrence_cmd, move_task_cmd, rename_board_cmd, rename_calendar_cmd, rename_column_cmd,
     rename_shopping_list_cmd, reorder_board_cmd, reorder_column_cmd, set_shopping_budget_cmd,
     toggle_shopping_item_cmd, unlog_habit_cmd, update_event_cmd, update_habit_cmd,
-    update_shopping_item_cmd, create_calendar_cmd, create_event_cmd,
+    update_shopping_item_cmd, update_task_cmd, create_calendar_cmd, create_event_cmd,
     DbState,
 };
 use std::sync::Mutex;
@@ -46,6 +46,7 @@ pub fn run() {
             create_task_cmd,
             list_tasks_cmd,
             move_task_cmd,
+            update_task_cmd,
             delete_task_cmd,
             create_habit_cmd,
             list_habits_cmd,

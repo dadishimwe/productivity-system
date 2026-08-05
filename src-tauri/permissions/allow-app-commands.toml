@@ -15,6 +15,7 @@ commands.allow = [
   "create_task_cmd",
   "list_tasks_cmd",
   "move_task_cmd",
+  "update_task_cmd",
   "delete_task_cmd",
   "create_habit_cmd",
   "list_habits_cmd",
