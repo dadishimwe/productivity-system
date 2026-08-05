@@ -27,6 +27,7 @@ import {
 import { confirmDelete, promptDialog, promptRename } from "../lib/dialogs";
 import { positionBetween } from "../lib/positioning";
 import { statusLabel } from "../lib/taskStatus";
+import { showToast } from "./ToastHost";
 import { MenuButton } from "./Menu";
 import { TaskDrawer } from "./TaskDrawer";
 
@@ -365,6 +366,7 @@ export function BoardView({ onError }: { onError: (msg: string) => void }) {
   async function deleteTask(taskId: string) {
     if (!(await confirmDelete("this task"))) return;
     await invoke("delete_task_cmd", { taskId });
+    showToast("Task deleted");
     if (boardId) await loadBoardData(boardId);
   }
 

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE google_accounts SET updated_at = ?1 WHERE id = ?2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "970e9be2f637edf964e30f649f6e4c3e7e47003eac6a8f755498b82faf5d7545"
+}

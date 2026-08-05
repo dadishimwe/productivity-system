@@ -6,6 +6,7 @@ import {
   type TaskStatus,
 } from "../lib/taskStatus";
 import type { Task } from "./BoardView";
+import { Select } from "./Select";
 
 type Props = {
   task: Task;
@@ -94,17 +95,17 @@ export function TaskDrawer({ task, onClose, onSave, onDelete }: Props) {
           </label>
           <label className="block text-xs text-zinc-500">
             Status
-            <select
-              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1.5 text-sm"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as TaskStatus)}
-            >
-              {TASK_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {TASK_STATUS_LABELS[s]}
-                </option>
-              ))}
-            </select>
+            <div className="mt-1">
+              <Select
+                aria-label="Status"
+                value={status}
+                options={TASK_STATUSES.map((s) => ({
+                  value: s,
+                  label: TASK_STATUS_LABELS[s],
+                }))}
+                onChange={(v) => setStatus(v as TaskStatus)}
+              />
+            </div>
           </label>
           <label className="block text-xs text-zinc-500">
             Due date

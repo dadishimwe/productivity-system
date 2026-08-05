@@ -6,6 +6,7 @@ pub mod envelope;
 pub mod error;
 pub mod event_exceptions;
 pub mod events;
+pub mod google_accounts;
 pub mod habit_logs;
 pub mod habits;
 pub mod occurrences;

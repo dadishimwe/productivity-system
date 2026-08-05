@@ -1,6 +1,7 @@
 use productivity_core::{
-    boards, calendars, columns, events, habit_logs, habits, shopping_items, shopping_lists,
-    create_task, delete_task, init_pool, list_tasks, move_task, update_task, AppState,
+    boards, calendars, columns, events, google_accounts, habit_logs, habits, shopping_items,
+    shopping_lists, create_task, delete_task, init_pool, list_tasks, move_task, update_task,
+    AppState,
 };
 use serde::Serialize;
 use std::path::PathBuf;
@@ -910,4 +911,59 @@ pub async fn delete_occurrence_cmd(
     )
     .await
     .map_err(map_err)
+}
+
+#[derive(Serialize)]
+pub struct GoogleAccountDto {
+    pub id: String,
+    pub email: String,
+}
+
+impl From<productivity_core::google_accounts::GoogleAccount> for GoogleAccountDto {
+    fn from(a: productivity_core::google_accounts::GoogleAccount) -> Self {
+        Self {
+            id: a.id,
+            email: a.email,
+        }
+    }
+}
+
+fn map_user_err(msg: String) -> tauri::Error {
+    tauri::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, msg))
+}
+
+#[tauri::command]
+pub async fn list_google_accounts_cmd(
+    db_state: State<'_, DbState>,
+) -> tauri::Result<Vec<GoogleAccountDto>> {
+    let state = app_state(&db_state)?;
+    Ok(google_accounts::list_accounts(&state)
+        .await
+        .map_err(map_err)?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+}
+
+#[tauri::command]
+pub async fn connect_google_oauth_cmd(
+    app: tauri::AppHandle,
+    db_state: State<'_, DbState>,
+) -> tauri::Result<GoogleAccountDto> {
+    let state = app_state(&db_state)?;
+    Ok(crate::google_oauth::connect_google(&app, &state)
+        .await
+        .map_err(map_user_err)?
+        .into())
+}
+
+#[tauri::command]
+pub async fn disconnect_google_account_cmd(
+    db_state: State<'_, DbState>,
+    id: String,
+) -> tauri::Result<()> {
+    let state = app_state(&db_state)?;
+    crate::google_oauth::disconnect_google(&state, &id)
+        .await
+        .map_err(map_user_err)
 }

@@ -52,3 +52,8 @@ After changing SQL or migrations, run `./scripts/prepare-sqlx.sh` again and comm
 ## Phase 3
 
 - **Calendar** — local calendars and events; `list_occurrences` expands `RRULE` via the `rrule` crate; `event_exceptions` for move/delete-this-instance; week + month views, edit modal, drag-to-reschedule with scope prompts; outbox includes `event_exception` rows
+
+## Phase 4 (in progress)
+
+- **Google accounts** — OAuth (PKCE + loopback) stores refresh token in the OS keychain; account email in SQLite (`google_accounts`); connect/disconnect from the Calendar tab
+- **Next:** calendar list linking, incremental sync, push local changes — requires `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET` in the environment when launching the app

@@ -4,6 +4,7 @@ import { CalendarView } from "./components/CalendarView";
 import { DialogHost } from "./components/DialogHost";
 import { HabitsView } from "./components/HabitsView";
 import { ShoppingView } from "./components/ShoppingView";
+import { ToastHost } from "./components/ToastHost";
 
 type Tab = "board" | "habits" | "shopping" | "calendar";
 
@@ -43,6 +44,7 @@ export default function App() {
       </header>
 
       <DialogHost />
+      <ToastHost />
 
       {error && (
         <p className="mb-4 rounded border border-red-900/50 bg-red-950/40 px-3 py-2 text-sm text-red-200">

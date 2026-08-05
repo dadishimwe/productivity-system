@@ -22,6 +22,8 @@ import {
   type RecurrencePreset,
 } from "../lib/recurrence";
 import { IconButton } from "./IconButton";
+import { GoogleSyncPanel } from "./GoogleSyncPanel";
+import { Select } from "./Select";
 
 type Calendar = { id: string; name: string; color: string | null };
 
@@ -317,19 +319,18 @@ export function CalendarView({ onError }: { onError: (msg: string) => void }) {
 
   return (
     <div className="space-y-4">
+      <GoogleSyncPanel onError={onError} />
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm text-zinc-400">Calendar</span>
-        <select
-          className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm"
-          value={calendarId ?? ""}
-          onChange={(e) => setCalendarId(e.target.value || null)}
-        >
-          {calendars.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-[10rem]">
+          <Select
+            aria-label="Calendar"
+            value={calendarId ?? ""}
+            options={calendars.map((c) => ({ value: c.id, label: c.name }))}
+            placeholder="No calendars"
+            onChange={(id) => setCalendarId(id || null)}
+          />
+        </div>
         {calendarId && (
           <>
             <IconButton

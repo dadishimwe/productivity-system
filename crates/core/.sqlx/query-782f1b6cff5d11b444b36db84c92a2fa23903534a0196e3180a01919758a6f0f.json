@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            id as \"id!\",\n            email as \"email!\",\n            created_at as \"created_at!\",\n            updated_at as \"updated_at!\",\n            deleted_at\n        FROM google_accounts\n        WHERE deleted_at IS NULL\n        ORDER BY email ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "email!",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at!",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "updated_at!",
+        "ordinal": 3,
+        "type_info": "Integer"
+      },
+      {
+        "name": "deleted_at",
+        "ordinal": 4,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "782f1b6cff5d11b444b36db84c92a2fa23903534a0196e3180a01919758a6f0f"
+}

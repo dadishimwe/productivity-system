@@ -47,4 +47,7 @@ commands.allow = [
   "delete_event_cmd",
   "move_occurrence_cmd",
   "delete_occurrence_cmd",
+  "list_google_accounts_cmd",
+  "connect_google_oauth_cmd",
+  "disconnect_google_account_cmd",
 ]

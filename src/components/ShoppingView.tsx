@@ -3,6 +3,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { confirmDelete, promptRename, promptText } from "../lib/dialogs";
 import { formatMoney, parseMoneyToCents } from "../lib/money";
 import { IconButton } from "./IconButton";
+import { Select } from "./Select";
 
 type ShoppingList = {
   id: string;
@@ -173,18 +174,15 @@ export function ShoppingView({ onError }: { onError: (msg: string) => void }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm text-zinc-400">List</span>
-        <select
-          className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm"
-          value={listId ?? ""}
-          onChange={(e) => setListId(e.target.value || null)}
-        >
-          {lists.length === 0 && <option value="">No lists</option>}
-          {lists.map((l) => (
-            <option key={l.id} value={l.id}>
-              {l.name}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-[10rem]">
+          <Select
+            aria-label="Shopping list"
+            value={listId ?? ""}
+            options={lists.map((l) => ({ value: l.id, label: l.name }))}
+            placeholder="No lists"
+            onChange={(id) => setListId(id || null)}
+          />
+        </div>
         {listId && (
           <>
             <IconButton

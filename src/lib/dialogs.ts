@@ -6,6 +6,8 @@ export async function confirmDelete(label: string): Promise<boolean> {
   );
 }
 
+export { confirmDialog };
+
 export async function promptRename(
   current: string,
   kind: string,
